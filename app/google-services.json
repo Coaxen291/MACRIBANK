@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "214073291290",
+    "project_id": "macri-bank",
+    "storage_bucket": "macri-bank.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214073291290:android:e88844329d83f6a8c097a3",
+        "android_client_info": {
+          "package_name": "com.utp.macribank"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkUI0zJci-zIvzSwasP523If8_clTijYI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
