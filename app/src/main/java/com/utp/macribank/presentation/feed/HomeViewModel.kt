@@ -10,9 +10,9 @@ import com.utp.macribank.domain.repository.AuthRepository
 import com.utp.macribank.domain.repository.TransactionRepository
 import com.utp.macribank.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,37 +28,47 @@ class HomeViewModel @Inject constructor(
     val transactions: State<List<Transaction>> = _transactions
 
     var selectedTransaction: Transaction? = null
+    
+    private var userJob: Job? = null
+    private var transJob: Job? = null
 
     init {
-        loadUserData()
-        loadTransactions()
+        refreshData()
     }
 
-    private fun loadTransactions() {
+    fun refreshData() {
         val currentUser = authRepository.getCurrentUser()
-        currentUser?.let { userAuth ->
-            transactionRepository.getTransactions(userAuth.id).onEach { result ->
-                if (result is Resource.Success) {
-                    _transactions.value = result.data ?: emptyList()
-                }
-            }.launchIn(viewModelScope)
+        if (currentUser == null) {
+            _userState.value = User()
+            _transactions.value = emptyList()
+            return
         }
-    }
 
-    private fun loadUserData() {
-        val currentUser = authRepository.getCurrentUser()
-        currentUser?.let { userAuth ->
-            authRepository.getUserData(userAuth.id).onEach { result ->
-                if (result is Resource.Success) {
-                    result.data?.let {
-                        _userState.value = it
-                    }
-                }
-            }.launchIn(viewModelScope)
-        }
+        // Cancelar suscripciones anteriores si existen
+        userJob?.cancel()
+        transJob?.cancel()
+
+        // Escuchar datos del usuario
+        userJob = authRepository.getUserData(currentUser.id).onEach { result ->
+            if (result is Resource.Success) {
+                result.data?.let { _userState.value = it }
+            }
+        }.launchIn(viewModelScope)
+
+        // Escuchar transacciones
+        transJob = transactionRepository.getTransactions(currentUser.id).onEach { result ->
+            if (result is Resource.Success) {
+                _transactions.value = result.data ?: emptyList()
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun logout() {
         authRepository.logout()
+        // Limpiar estado inmediatamente
+        _userState.value = User(name = "Cerrando sesión...")
+        _transactions.value = emptyList()
+        userJob?.cancel()
+        transJob?.cancel()
     }
 }

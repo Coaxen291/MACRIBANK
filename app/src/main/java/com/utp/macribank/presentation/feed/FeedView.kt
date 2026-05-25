@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +37,11 @@ fun FeedView(
 ) {
     val user by viewModel.userState
     val transactions by viewModel.transactions
+
+    // Forzar actualización al entrar a la vista
+    LaunchedEffect(Unit) {
+        viewModel.refreshData()
+    }
 
     Scaffold(
         topBar = {
