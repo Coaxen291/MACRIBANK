@@ -45,13 +45,21 @@ fun MoreView(navController: NavController) {
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
-            item { MoreItem("Mis Tarjetas", Icons.Default.CreditCard) }
+            item { 
+                MoreItem("Mis Tarjetas", Icons.Default.CreditCard) {
+                    navController.navigate("cards")
+                }
+            }
             item { 
                 MoreItem("Consignar Plata", Icons.Default.AccountBalance) {
                     navController.navigate("deposit")
                 }
             }
-            item { MoreItem("Préstamos", Icons.Default.AccountBalance) }
+            item { 
+                MoreItem("Préstamos", Icons.Default.AccountBalance) {
+                    navController.navigate("loans")
+                }
+            }
             item { MoreItem("Inversiones", Icons.Default.TrendingUp) }
 
             item {
@@ -65,7 +73,11 @@ fun MoreView(navController: NavController) {
                 )
             }
             item { MoreItem("Cambiar Clave", Icons.Default.Lock) }
-            item { MoreItem("Atención al Cliente", Icons.Default.SupportAgent) }
+            item { 
+                MoreItem("Atención al Cliente", Icons.Default.SupportAgent) {
+                    navController.navigate("support")
+                }
+            }
             item { MoreItem("Puntos de Atención", Icons.Default.LocationOn) }
         }
     }

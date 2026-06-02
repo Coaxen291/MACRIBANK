@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.utp.macribank.presentation.login.LoginView
 import com.utp.macribank.presentation.login.RegisterView
 import com.utp.macribank.presentation.feed.FeedView
+import com.utp.macribank.presentation.splash.SplashView
 import com.utp.macribank.presentation.feed.TransferView
 import com.utp.macribank.presentation.feed.ReceiveView
 import com.utp.macribank.presentation.feed.BillsView
@@ -15,6 +16,10 @@ import com.utp.macribank.presentation.feed.DepositView
 import com.utp.macribank.presentation.feed.TransactionDetailView
 import com.utp.macribank.presentation.feed.HomeViewModel
 import com.utp.macribank.presentation.profile.ProfileView
+import com.utp.macribank.presentation.security.CameraVerificationView
+import com.utp.macribank.presentation.more.CardsView
+import com.utp.macribank.presentation.more.LoansView
+import com.utp.macribank.presentation.more.SupportView
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
@@ -24,8 +29,12 @@ fun AppNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = "login"
+        startDestination = "splash"
     ) {
+        composable("splash") {
+            SplashView(navController = navController)
+        }
+
         composable("login") {
             LoginView(navController = navController)
         }
@@ -66,6 +75,22 @@ fun AppNavigation() {
             homeViewModel.selectedTransaction?.let { transaction ->
                 TransactionDetailView(navController = navController, transaction = transaction)
             }
+        }
+
+        composable("camera_verify") {
+            CameraVerificationView(navController = navController)
+        }
+
+        composable("cards") {
+            CardsView(navController = navController)
+        }
+
+        composable("loans") {
+            LoansView(navController = navController)
+        }
+
+        composable("support") {
+            SupportView(navController = navController)
         }
     }
 }

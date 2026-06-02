@@ -7,13 +7,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -80,7 +80,8 @@ fun ProfileView(
             // Info Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     ProfileInfoItem("Número de Cuenta", user.accountNumber)
@@ -88,6 +89,33 @@ fun ProfileView(
                     ProfileInfoItem("Banco", "MACRI BANK S.A.")
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
                     ProfileInfoItem("Estado de cuenta", "Activa")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Sección de Seguridad
+            Text(
+                text = "Seguridad",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                    SecurityToggleItem("Huella Digital / FaceID", true)
+                    Divider(modifier = Modifier.padding(vertical = 4.dp))
+                    SecurityToggleItem("Notificaciones de gastos", true)
+                    Divider(modifier = Modifier.padding(vertical = 4.dp))
+                    SecurityToggleItem("Dinamismo de CVV", false)
                 }
             }
 
@@ -106,6 +134,19 @@ fun ProfileView(
                 Text("Cerrar Sesión", color = Color.White)
             }
         }
+    }
+}
+
+@Composable
+fun SecurityToggleItem(label: String, initialValue: Boolean) {
+    var checked by remember { mutableStateOf(initialValue) }
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = label, style = MaterialTheme.typography.bodyMedium)
+        Switch(checked = checked, onCheckedChange = { checked = it })
     }
 }
 

@@ -10,9 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +35,11 @@ fun FeedView(
 ) {
     val user by viewModel.userState
     val transactions by viewModel.transactions
+
+    // Estados para la "Cortina" (Bottom Sheet)
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    var selectedTransactionForSheet by remember { mutableStateOf<Transaction?>(null) }
 
     // Forzar actualización al entrar a la vista
     LaunchedEffect(Unit) {
@@ -97,8 +100,9 @@ fun FeedView(
 
             items(transactions) { transaction ->
                 TransactionItem(transaction) {
-                    viewModel.selectedTransaction = transaction
-                    navController.navigate("transactionDetail")
+                    // Al hacer clic, mostramos la "Cortina"
+                    selectedTransactionForSheet = transaction
+                    showBottomSheet = true
                 }
             }
             
@@ -106,6 +110,89 @@ fun FeedView(
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
+    }
+
+    // LA CORTINA (Modal Bottom Sheet)
+    if (showBottomSheet) {
+        selectedTransactionForSheet?.let { transaction ->
+            ModalBottomSheet(
+                onDismissRequest = { showBottomSheet = false },
+                sheetState = sheetState,
+                containerColor = Color.White
+            ) {
+                TransactionDetailSheetContent(transaction)
+            }
+        }
+    }
+}
+
+@Composable
+fun TransactionDetailSheetContent(transaction: Transaction) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(24.dp)
+            .padding(bottom = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Comprobante de Movimiento",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+        
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(
+            text = (if (transaction.type == TransactionType.INCOME) "+" else "-") + formatCurrency(transaction.amount),
+            style = MaterialTheme.typography.displayMedium,
+            fontWeight = FontWeight.Bold,
+            color = if (transaction.type == TransactionType.INCOME) Color(0xFF2E7D32) else Color.Black
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        Text(
+            text = if (transaction.type == TransactionType.INCOME) "Dinero recibido" else "Dinero enviado",
+            color = Color.Gray
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                DetailRow("Descripción", transaction.description)
+                Divider(modifier = Modifier.padding(vertical = 12.dp), color = Color.LightGray.copy(alpha = 0.5f))
+                DetailRow("Fecha", SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(transaction.date))
+                Divider(modifier = Modifier.padding(vertical = 12.dp), color = Color.LightGray.copy(alpha = 0.5f))
+                DetailRow("Hora", SimpleDateFormat("hh:mm:ss a", Locale.getDefault()).format(transaction.date))
+                Divider(modifier = Modifier.padding(vertical = 12.dp), color = Color.LightGray.copy(alpha = 0.5f))
+                DetailRow("Categoría", transaction.category)
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(32.dp))
+        
+        Button(
+            onClick = { /* Compartir logic */ },
+            modifier = Modifier.fillMaxWidth().height(56.dp)
+        ) {
+            Text("Compartir Comprobante")
+        }
+    }
+}
+
+@Composable
+fun DetailRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(label, color = Color.Gray, style = MaterialTheme.typography.bodyMedium)
+        Text(value, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyLarge)
     }
 }
 
